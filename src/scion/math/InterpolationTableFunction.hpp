@@ -81,6 +81,13 @@ namespace math {
         std::advance( xEnd, this->boundaries()[i] + 1 );
         std::advance( fEnd, this->boundaries()[i] + 1 );
 
+        if ( std::distance( xStart, xEnd ) < 2 ) {
+
+          Log::error( "Insufficient x values and f(y) functions defined for an interpolation "
+                      "region (at least 2 points are required)" );
+          throw std::exception();
+        }
+
         switch ( this->interpolants()[i] ) {
 
           case interpolation::InterpolationType::LinearLinear : {
@@ -88,7 +95,8 @@ namespace math {
             tables.emplace_back(
               LinearLinearTableFunction< X, F, XContainer, FContainer >(
                 XContainer( xStart, xEnd ),
-                FContainer( fStart, fEnd ) ) );
+                FContainer( fStart, fEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::Histogram : {
@@ -96,7 +104,8 @@ namespace math {
             tables.emplace_back(
               HistogramTableFunction< X, F, XContainer, FContainer >(
                 XContainer( xStart, xEnd ),
-                FContainer( fStart, fEnd ) ) );
+                FContainer( fStart, fEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LinearLog : {
@@ -104,7 +113,8 @@ namespace math {
             tables.emplace_back(
               LinearLogTableFunction< X, F, XContainer, FContainer >(
                 XContainer( xStart, xEnd ),
-                FContainer( fStart, fEnd ) ) );
+                FContainer( fStart, fEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LogLinear : {
@@ -112,7 +122,8 @@ namespace math {
             tables.emplace_back(
               LogLinearTableFunction< X, F, XContainer, FContainer >(
                 XContainer( xStart, xEnd ),
-                FContainer( fStart, fEnd ) ) );
+                FContainer( fStart, fEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LogLog : {
@@ -120,7 +131,8 @@ namespace math {
             tables.emplace_back(
               LogLogTableFunction< X, F, XContainer, FContainer >(
                 XContainer( xStart, xEnd ),
-                FContainer( fStart, fEnd ) ) );
+                FContainer( fStart, fEnd ),
+                false ) );
             break;
           }
           default : {
@@ -377,6 +389,12 @@ namespace math {
         auto offset = std::distance( std::lower_bound( x.begin(), x.end(), *xIter ), x.end() ) - 1;
         x.erase( std::prev( x.end(), offset ), x.end() );
         f.erase( std::prev( f.end(), offset ), f.end() );
+        if ( ( boundaries.size() > 1 ) && ( *std::prev( boundaries.end(), 2 ) == x.size() - 1 ) ) {
+
+          boundaries.pop_back();
+          interpolants.pop_back();
+        }
+        boundaries.back() = x.size() - 1;
       }
 
       return { std::move( x ), std::move( f ),

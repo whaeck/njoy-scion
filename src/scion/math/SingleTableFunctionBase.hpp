@@ -87,13 +87,17 @@ namespace math {
     /**
      *  @brief Constructor
      *
-     *  @param x   the x values of the tabulated data
-     *  @param f   the f(y) functions of the tabulated data
+     *  @param x        the x values of the tabulated data
+     *  @param f        the f(y) functions of the tabulated data
+     *  @param verify   flag to indicate whether or not to perform verification tests (default true)
      */
-    SingleTableFunctionBase( XContainer x, FContainer f ) :
+    SingleTableFunctionBase( XContainer x, FContainer f, bool verify = true ) :
       x_( std::move( x ) ), f_( std::move( f ) ) {
 
-      verifyTable( this->x(), this->f() );
+      if ( verify ) {
+
+        verifyTable( this->x(), this->f() );
+      }
     }
 
   public:

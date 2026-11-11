@@ -85,11 +85,12 @@ namespace math {
     /**
      *  @brief Constructor
      *
-     *  @param x   the x values of the tabulated data
-     *  @param f   the f(y) functions of the tabulated data
+     *  @param x        the x values of the tabulated data
+     *  @param f        the f(y) functions of the tabulated data
+     *  @param verify   flag to indicate whether or not to perform verification tests (default true)
      */
-    LinearLinearTableFunction( XContainer x, FContainer f ) :
-      Parent( std::move( x ), std::move( f ) ) {}
+    LinearLinearTableFunction( XContainer x, FContainer f, bool verify = true ) :
+      Parent( std::move( x ), std::move( f ), verify ) {}
 
     /* methods */
 
