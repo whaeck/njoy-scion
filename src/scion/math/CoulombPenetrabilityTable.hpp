@@ -93,9 +93,10 @@ namespace math {
      *  @param x           the x values of the tabulated data
      *  @param y           the y values of the tabulated data
      *  @param threshold   the threshold value
+     *  @param verify      flag to indicate whether or not to perform verification tests (default true)
      */
-    CoulombPenetrabilityTable( XContainer x, YContainer y, X threshold ) :
-        Parent( std::move( x ), std::move( y ) ),
+    CoulombPenetrabilityTable( XContainer x, YContainer y, X threshold, bool verify = true ) :
+        Parent( std::move( x ), std::move( y ), verify ),
         threshold_( std::move( threshold ) ) {
 
       verifyTable( this->x(), this->threshold() );

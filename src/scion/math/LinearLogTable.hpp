@@ -83,11 +83,12 @@ namespace math {
     /**
      *  @brief Constructor
      *
-     *  @param x   the x values of the tabulated data
-     *  @param y   the y values of the tabulated data
+     *  @param x        the x values of the tabulated data
+     *  @param y        the y values of the tabulated data
+     *  @param verify   flag to indicate whether or not to perform verification tests (default true)
      */
-    LinearLogTable( XContainer x, YContainer y ) :
-      Parent( std::move( x ), std::move( y ) ) {}
+    LinearLogTable( XContainer x, YContainer y, bool verify = true ) :
+      Parent( std::move( x ), std::move( y ), verify ) {}
 
     /* methods */
 

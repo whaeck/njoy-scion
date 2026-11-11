@@ -177,6 +177,13 @@ namespace math {
         std::advance( xEnd, this->boundaries()[i] + 1 );
         std::advance( yEnd, this->boundaries()[i] + 1 );
 
+        if ( std::distance( xStart, xEnd ) < 2 ) {
+
+          Log::error( "Insufficient x and y values defined for an interpolation region "
+                      "(at least 2 points are required)" );
+          throw std::exception();
+        }
+
         switch ( this->interpolants()[i] ) {
 
           case interpolation::InterpolationType::LinearLinear : {
@@ -184,7 +191,8 @@ namespace math {
             tables.emplace_back(
               LinearLinearTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::Histogram : {
@@ -192,28 +200,32 @@ namespace math {
             tables.emplace_back(
               HistogramTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LinearLog : {
 
             tables.emplace_back( LinearLogTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LogLinear : {
 
             tables.emplace_back( LogLinearTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LogLog : {
 
             tables.emplace_back( LogLogTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::CoulombPenetrability : {
@@ -228,7 +240,8 @@ namespace math {
             tables.emplace_back( CoulombPenetrabilityTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
                 YContainer( yStart, yEnd ),
-                this->threshold().value() ) );
+                this->threshold().value(),
+                false ) );
             break;
           }
           default : {
@@ -486,6 +499,12 @@ namespace math {
         auto offset = std::distance( std::lower_bound( x.begin(), x.end(), *xIter ), x.end() ) - 1;
         x.erase( std::prev( x.end(), offset ), x.end() );
         y.erase( std::prev( y.end(), offset ), y.end() );
+        if ( ( boundaries.size() > 1 ) && ( *std::prev( boundaries.end(), 2 ) == x.size() - 1 ) ) {
+
+          boundaries.pop_back();
+          interpolants.pop_back();
+        }
+        boundaries.back() = x.size() - 1;
       }
 
       // see if the table is linearised
