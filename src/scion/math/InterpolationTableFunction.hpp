@@ -417,15 +417,13 @@ namespace math {
 
       if ( this->numberRegions() > 1 ) {
 
-        // look in the grid for the x value
-        // upper_bound is used to get above jumps in the grid
-        auto xIter = std::upper_bound( this->x().begin(),
-                                       this->x().end(), x );
-        index = std::distance( this->x().begin(), xIter );
-
         // get the table that has to interpolate on this value
-        auto bIter = std::lower_bound( this->boundaries().begin(),
-                                       this->boundaries().end(), index );
+        auto compare = [&] ( const X& value, std::size_t boundary ) {
+
+          return value < this->x()[boundary];
+        };
+        auto bIter = std::upper_bound( this->boundaries().begin(),
+                                       this->boundaries().end(), x, compare );
         if ( this->boundaries().end() == bIter ) {
 
           --bIter;
