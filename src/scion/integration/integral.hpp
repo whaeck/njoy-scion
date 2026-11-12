@@ -17,16 +17,23 @@ namespace integration {
    *
    *  This calculates the integral over the entire x range.
    *
-   *  @param[in,out] xbegin       the interator to the upper x value of the current interval
-   *  @param[in]     xend         the interator to the end of the x values
-   *  @param[in,out] ybegin       the interator to the upper y value of the current interval
-   *  @param[in]     integrator   the integrator to be applied
+   *  @param[in] xbegin       the iterator to the first x value
+   *  @param[in] xend         the iterator to the end of the x values
+   *  @param[in] ybegin       the iterator to the first y value
+   *  @param[in] integrator   the integrator to be applied
    */
   template< typename XIterator, typename YIterator, typename Integrator >
-  auto integral( XIterator& xbegin, const XIterator& xend,
-                 YIterator& ybegin, const Integrator& integrator ) {
+  auto integral( XIterator xbegin, XIterator xend,
+                 YIterator ybegin, const Integrator& integrator ) {
 
-    auto result = integrator( *xbegin, *xbegin, *ybegin, *ybegin );
+    if ( xbegin != xend ) {
+
+      ++xbegin;
+      ++ybegin;
+    }
+
+    using R = decltype( integrator( *xbegin, *xbegin, *ybegin, *ybegin ) );
+    R result( 0 );
     while ( xbegin != xend ) {
 
       result += integrator( *std::prev( xbegin ), *xbegin, *std::prev( ybegin ), *ybegin );
@@ -48,13 +55,9 @@ namespace integration {
    *  @param[in] integrator   the integrator to be applied
    */
   template< typename XRange, typename YRange, typename Integrator >
-  auto integral( const XRange& x, const YRange& y,
-                 const Integrator& integrator ) {
+  auto integral( const XRange& x, const YRange& y, const Integrator& integrator ) {
 
-    // the iterators point to the end of the first interval
-    auto xbegin = std::begin( x ) + 1;
-    auto ybegin = std::begin( y ) + 1;
-    return integral( xbegin, x.end(), ybegin, integrator );
+    return integral( x.begin(), x.end(), y.begin(), integrator );
   }
 
   /**
@@ -62,14 +65,14 @@ namespace integration {
    *
    *  This calculates the integral over a user provided set of boundaries.
    *
-   *  @param[in]     xbegin         the iterator to the first x value
-   *  @param[in]     xend           the iterator to the end of the x values
-   *  @param[in]     ybegin         the iterator to the first y value
-   *  @param[in]     gbegin         the iterator to the first group boundary
-   *  @param[in]     gend           the iterator to the end of the group boundaries
-   *  @param[in,out] rbegin         the iterator to the integral for the first group
-   *  @param[in]     interpolator   the interpolation function for a panel
-   *  @param[in]     integrator     the integration function for a panel
+   *  @param[in] xbegin         the iterator to the first x value
+   *  @param[in] xend           the iterator to the end of the x values
+   *  @param[in] ybegin         the iterator to the first y value
+   *  @param[in] gbegin         the iterator to the first group boundary
+   *  @param[in] gend           the iterator to the end of the group boundaries
+   *  @param[in] rbegin         the iterator to the integral for the first group
+   *  @param[in] interpolator   the interpolation function for a panel
+   *  @param[in] integrator     the integration function for a panel
    */
   template < typename XIterator, typename YIterator,
              typename BIterator, typename RIterator,
