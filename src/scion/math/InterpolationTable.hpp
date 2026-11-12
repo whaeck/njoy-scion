@@ -1121,38 +1121,21 @@ namespace math {
     template < typename WeightFunction >
     decltype(auto) cumulativeIntegrate( const WeightFunction& weight ) const {
 
-      using I = decltype( weight.integrateHistogram( this->x()[0], this->x()[1], this->y()[0], this->y()[1] ) );
+      using I = decltype( std::declval< X >() * std::declval< Y >() * std::declval< typename WeightFunction::YType >() );
+      std::vector< I > result( this->x().size(), I( 0. ) );
+      auto previous = result.begin();
 
-      I first{ 0. };
-      auto cumulative = [&] ( auto&& table ) {
+      auto integrate = [&] ( const auto& table ) {
 
-        return table.cumulativeIntegrate( first, weight );
+        auto rbegin = std::next( result.begin(), std::distance( this->x().begin(), table.x().begin() ) );
+        std::fill( previous, std::next( rbegin ), *previous );
+        table.cumulativeIntegrate( rbegin, weight );
+        previous = std::next( rbegin, table.numberPoints() - 1 );
       };
 
-      auto number_equal_x = [this] ( const auto& table ) {
+      for ( const auto& table : this->tables() ) {
 
-        return std::distance( std::prev( table.x().end() ),
-                              std::upper_bound( table.x().end(), this->x().end(),
-                                                table.x().back() ) );
-      };
-
-      auto iter = this->tables().begin();
-      auto result = std::visit( cumulative, *iter );
-      ++iter;
-
-      while ( iter != this->tables().end() ) {
-
-        first = result.back();
-        auto integrals = std::visit( cumulative, *iter );
-        auto points = std::visit( number_equal_x, *std::prev( iter ) );
-
-        if ( points > 1 ) {
-
-          result.insert( result.end(), points - 1, first );
-        }
-        result.insert( result.end(), std::next( integrals.begin() ), integrals.end() );
-
-        ++iter;
+        std::visit( integrate, table );
       }
 
       return result;

@@ -122,20 +122,18 @@ namespace math {
     /**
      *  @brief Calculate the cumulative integral of w(x) * f(x) dx over the interpolation region
      *
-     *  @param[in] initial   the initial value of the cumulative integral to be used
-     *                       (i.e. the value of the integral at the end of the previous
-     *                       interpolation zone or zero if this is the first region)
-     *  @param[in] weight    the weight function
+     *  @param[in] rbegin   the iterator to the cumulative integral for the first x value
+     *  @param[in] weight   the weight function
      */
-    template < typename I, typename WeightFunction >
-    std::vector< I > cumulativeIntegrate( const I& initial, const WeightFunction& weight ) const {
+    template < typename RIterator, typename WeightFunction >
+    void cumulativeIntegrate( RIterator rbegin, const WeightFunction& weight ) const {
 
       auto integrator = [&] ( const X& xLeft, const X& xRight,
                               const Y& yLeft, const Y& yRight ) -> decltype(auto) {
 
         return weight.integrateLogarithmicLinear( xLeft, xRight, yLeft, yRight );
       };
-      return integration::cumulativeIntegral( initial, this->x(), this->y(), integrator );
+      return integration::cumulativeIntegral( this->x(), this->y(), rbegin, integrator );
     }
 
     /**

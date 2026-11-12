@@ -82,7 +82,8 @@ SCENARIO( "LinearLinearTable" ) {
 
       THEN( "the cumulative integral of a LinearLinearTable can be calculated" ) {
 
-        auto cumulative = chunk.cumulativeIntegrate( 0., constant );
+        std::vector< double > cumulative = { 0., 0., 0., 0. };
+        chunk.cumulativeIntegrate( cumulative.begin(), constant );
         CHECK( 4 == cumulative.size() );
         CHECK_THAT( 0. , WithinRel( cumulative[0] ) );
         CHECK_THAT( 3.5, WithinRel( cumulative[1] ) );
@@ -200,7 +201,8 @@ SCENARIO( "LinearLinearTable" ) {
 
       THEN( "the cumulative integral of a LinearLinearTable can be calculated" ) {
 
-        auto cumulative = chunk.cumulativeIntegrate( 0., constant );
+        std::vector< double > cumulative = { 0., 0., 0., 0. };
+        chunk.cumulativeIntegrate( cumulative.begin(), constant );
         CHECK( 4 == cumulative.size() );
         CHECK_THAT( 0. , WithinRel( cumulative[0] ) );
         CHECK_THAT( 3.5, WithinRel( cumulative[1] ) );

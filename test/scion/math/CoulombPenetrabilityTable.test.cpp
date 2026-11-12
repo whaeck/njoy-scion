@@ -122,7 +122,8 @@ SCENARIO( "CoulombPenetrabilityTable" ) {
 
       THEN( "the cumulative integral can be calculated" ) {
 
-        auto cumulative = chunk.cumulativeIntegrate( 0., constant );
+        std::vector< double > cumulative = { 0., 0., 0., 0. };
+        chunk.cumulativeIntegrate( cumulative.begin(), constant );
         CHECK( 4 == cumulative.size() );
         CHECK_THAT( 0. , WithinRel( cumulative[0] ) );
         CHECK_THAT( 14.080978126372528, WithinRel( cumulative[1], 1e-8 ) );
