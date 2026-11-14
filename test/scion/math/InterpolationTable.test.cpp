@@ -1620,8 +1620,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 2., 3., 4. };
       std::vector< double > y = { 4., 3., 2., 1. };
-      const std::vector< std::size_t > boundaries = { 1, 3 };
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 1, 3 };
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
@@ -1983,8 +1983,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 2., 2., 3., 4. };
       std::vector< double > y = { 4., 3., 4., 3., 2. };
-      const std::vector< std::size_t > boundaries = { 1, 4 };
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 1, 4 };
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
@@ -2353,8 +2353,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 2., 2., 2., 3., 4. }; // <-- jump of 3 x values
       std::vector< double > y = { 4., 3., 2., 4., 3., 2. };
-      const std::vector< std::size_t > boundaries = { 2, 5 }; // <-- pointing to middle of the jump
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 2, 5 }; // <-- pointing to middle of the jump
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
@@ -2480,8 +2480,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 2., 2., 2., 3., 4. }; // <-- jump of 3 x values
       std::vector< double > y = { 4., 3., 2., 4., 3., 2. };
-      const std::vector< std::size_t > boundaries = { 2, 5 }; // <-- pointing to middle of the jump
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 2, 5 }; // <-- pointing to middle of the jump
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
@@ -2810,8 +2810,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 2., 2., 3., 4. };
       std::vector< double > y = { 4., 3., 4., 3., 2. };
-      const std::vector< std::size_t > boundaries = { 2, 4 }; // <-- pointing to end of the jump
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 2, 4 }; // <-- pointing to end of the jump
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
@@ -2860,8 +2860,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 2., 3., 4., 4. }; // <-- jump at end
       std::vector< double > y = { 4., 3., 2., 1., 4. };
-      const std::vector< std::size_t > boundaries = { 1, 4 }; // <-- pointing to end
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 1, 4 }; // <-- pointing to end
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
@@ -2904,8 +2904,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 2., 3., 4., 4., 4. }; // <-- jump of 3 x values at end
       std::vector< double > y = { 4., 3., 2., 1., 4., 5. };
-      const std::vector< std::size_t > boundaries = { 1, 5 }; // <-- pointing to end
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 1, 5 }; // <-- pointing to end
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
@@ -2954,8 +2954,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 1., 2., 3., 4. }; // <-- jump at beginning
       std::vector< double > y = { 1., 4., 3., 2., 1. };
-      const std::vector< std::size_t > boundaries = { 2, 4 }; // <-- pointing to end
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 2, 4 }; // <-- pointing to end
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
@@ -2998,8 +2998,8 @@ SCENARIO( "InterpolationTable" ) {
 
       std::vector< double > x = { 1., 1., 1., 2., 3., 4. }; // <-- jump of 3 x values at beginning
       std::vector< double > y = { 1., 2., 4., 3., 2., 1. };
-      const std::vector< std::size_t > boundaries = { 3, 5 };
-      const std::vector< InterpolationType > interpolants = {
+      std::vector< std::size_t > boundaries = { 3, 5 };
+      std::vector< InterpolationType > interpolants = {
 
         InterpolationType::LinearLinear,
         InterpolationType::LinearLog
