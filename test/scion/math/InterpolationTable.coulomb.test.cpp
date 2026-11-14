@@ -25,8 +25,8 @@ SCENARIO( "InterpolationTable - coulomb penetrability specific tests" ) {
 
     WHEN( "the data is given explicitly" ) {
 
-      const std::vector< double > x = { 1., 2., 3., 4. };
-      const std::vector< double > y = { 4., 3., 2., 1. };
+      std::vector< double > x = { 1., 2., 3., 4. };
+      std::vector< double > y = { 4., 3., 2., 1. };
       InterpolationType interpolant = InterpolationType::LinearLinear;
 
       InterpolationTable< double > chunk( std::move( x ), std::move( y ),
@@ -63,8 +63,8 @@ SCENARIO( "InterpolationTable - coulomb penetrability specific tests" ) {
 
     WHEN( "the data is given explicitly" ) {
 
-      const std::vector< double > x = { 100., 200., 300., 400., 500. };
-      const std::vector< double > y = { 1.314e-60, 4.7703e-43, 2.6024e-35, 1.0178e-30, 1.3491e-27 };
+      std::vector< double > x = { 100., 200., 300., 400., 500. };
+      std::vector< double > y = { 1.314e-60, 4.7703e-43, 2.6024e-35, 1.0178e-30, 1.3491e-27 };
       InterpolationType interpolant = InterpolationType::CoulombPenetrability;
 
       InterpolationTable< double > chunk( std::move( x ), std::move( y ),
