@@ -833,49 +833,37 @@ namespace math {
         std::vector< std::size_t > boundaries;
         std::vector< interpolation::InterpolationType > interpolants;
 
-        auto linearise = [&convergence] ( const auto& table )
-                                        { return table.linearise( convergence ); };
+        auto linearise = [&convergence] ( const auto& table ) {
 
-        auto check = [this] ( const auto& table ) {
-
-          if ( table.x().end() == this->x().end() ) {
-
-            // end of table
-            return true;
-          }
-          else if ( *( table.x().end() ) != table.x().back() ) {
-
-            // no jump
-            return false;
-          }
-          else {
-
-            // this is a jump: move to the last point
-            auto xNext = std::prev( std::upper_bound( table.x().end(), this->x().end(),
-                                                      table.x().back() ) );
-            auto yNext = std::next( table.y().end(), std::distance( table.x().end(), xNext ) );
-            return *yNext != table.y().back();
-          }
+          return table.linearise( convergence );
         };
 
-        for ( const auto& table : this->tables_ ) {
+        for ( const auto& table : this->tables() ) {
 
-          auto linearised = std::visit( linearise, table );
-          bool isJumpOrEnd = std::visit( check, table );
+          auto [ xvalues, yvalues ] = std::visit( linearise, table );
 
-          if ( isJumpOrEnd ) {
+          bool skip = false;
+          if ( ! x.empty() ) {
 
-            x.insert( x.end(), linearised.first.begin(), linearised.first.end() );
-            y.insert( y.end(), linearised.second.begin(), linearised.second.end() );
-            boundaries.push_back( x.size() - 1 );
-            interpolants.push_back( interpolation::InterpolationType::LinearLinear );
+            if ( x.back() == xvalues.front() && y.back() == yvalues.front() ) {
+
+              // this is a shared point
+              skip = true;
+            }
+            else {
+
+              // this has to be a jump
+              boundaries.push_back( x.size() - 1 );
+              interpolants.push_back( interpolation::InterpolationType::LinearLinear );
+            }
           }
-          else {
 
-            x.insert( x.end(), linearised.first.begin(), std::prev( linearised.first.end() ) );
-            y.insert( y.end(), linearised.second.begin(), std::prev( linearised.second.end() ) );
-          }
+          x.insert( x.end(), skip ? std::next( xvalues.begin() ) : xvalues.begin(), xvalues.end() );
+          y.insert( y.end(), skip ? std::next( yvalues.begin() ) : yvalues.begin(), yvalues.end() );
         }
+
+        boundaries.push_back( x.size() - 1 );
+        interpolants.push_back( interpolation::InterpolationType::LinearLinear );
 
         return InterpolationTable( std::move( x ), std::move( y ),
                                    std::move( boundaries ), std::move( interpolants ) );
