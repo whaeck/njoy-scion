@@ -82,7 +82,8 @@ SCENARIO( "HistogramTable" ) {
 
       THEN( "the cumulative integral of a HistogramTable can be calculated" ) {
 
-        auto cumulative = chunk.cumulativeIntegrate( 0., constant );
+        std::vector< double > cumulative = { 0., 0., 0., 0. };
+        chunk.cumulativeIntegrate( cumulative.begin(), constant );
         CHECK( 4 == cumulative.size() );
         CHECK_THAT( 0., WithinRel( cumulative[0] ) );
         CHECK_THAT( 4., WithinRel( cumulative[1] ) );
@@ -212,7 +213,8 @@ SCENARIO( "HistogramTable" ) {
 
       THEN( "the cumulative integral of a HistogramTable can be calculated" ) {
 
-        auto cumulative = chunk.cumulativeIntegrate( 0., constant );
+        std::vector< double > cumulative = { 0., 0., 0., 0. };
+        chunk.cumulativeIntegrate( cumulative.begin(), constant );
         CHECK( 4 == cumulative.size() );
         CHECK_THAT( 0., WithinRel( cumulative[0] ) );
         CHECK_THAT( 4., WithinRel( cumulative[1] ) );

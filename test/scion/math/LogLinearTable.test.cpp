@@ -100,7 +100,8 @@ SCENARIO( "LogLinearTable" ) {
         //                                    << integrator( chunk, 1.,  2. )
         //                                     + integrator( chunk, 2.,  3. )
         //                                     + integrator( chunk, 3.,  4. ) << std::endl;
-        auto cumulative = chunk.cumulativeIntegrate( 0., constant );
+        std::vector< double > cumulative = { 0., 0., 0., 0. };
+        chunk.cumulativeIntegrate( cumulative.begin(), constant );
         CHECK( 4 == cumulative.size() );
         CHECK_THAT( 0.              , WithinRel( cumulative[0] ) );
         CHECK_THAT( 3.47605949678221, WithinRel( cumulative[1] ) );
@@ -280,7 +281,8 @@ SCENARIO( "LogLinearTable" ) {
         //                                    << integrator( chunk, 1.,  2. )
         //                                     + integrator( chunk, 2.,  3. )
         //                                     + integrator( chunk, 3.,  4. ) << std::endl;
-        auto cumulative = chunk.cumulativeIntegrate( 0., constant );
+        std::vector< double > cumulative = { 0., 0., 0., 0. };
+        chunk.cumulativeIntegrate( cumulative.begin(), constant );
         CHECK( 4 == cumulative.size() );
         CHECK_THAT( 0.              , WithinRel( cumulative[0] ) );
         CHECK_THAT( 3.47605949678221, WithinRel( cumulative[1] ) );

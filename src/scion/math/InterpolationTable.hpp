@@ -177,6 +177,13 @@ namespace math {
         std::advance( xEnd, this->boundaries()[i] + 1 );
         std::advance( yEnd, this->boundaries()[i] + 1 );
 
+        if ( std::distance( xStart, xEnd ) < 2 ) {
+
+          Log::error( "Insufficient x and y values defined for an interpolation region "
+                      "(at least 2 points are required)" );
+          throw std::exception();
+        }
+
         switch ( this->interpolants()[i] ) {
 
           case interpolation::InterpolationType::LinearLinear : {
@@ -184,7 +191,8 @@ namespace math {
             tables.emplace_back(
               LinearLinearTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::Histogram : {
@@ -192,28 +200,32 @@ namespace math {
             tables.emplace_back(
               HistogramTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LinearLog : {
 
             tables.emplace_back( LinearLogTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LogLinear : {
 
             tables.emplace_back( LogLinearTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::LogLog : {
 
             tables.emplace_back( LogLogTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
-                YContainer( yStart, yEnd ) ) );
+                YContainer( yStart, yEnd ),
+                false ) );
             break;
           }
           case interpolation::InterpolationType::CoulombPenetrability : {
@@ -228,7 +240,8 @@ namespace math {
             tables.emplace_back( CoulombPenetrabilityTable< X, Y, XContainer, YContainer >(
                 XContainer( xStart, xEnd ),
                 YContainer( yStart, yEnd ),
-                this->threshold().value() ) );
+                this->threshold().value(),
+                false ) );
             break;
           }
           default : {
@@ -486,12 +499,20 @@ namespace math {
         auto offset = std::distance( std::lower_bound( x.begin(), x.end(), *xIter ), x.end() ) - 1;
         x.erase( std::prev( x.end(), offset ), x.end() );
         y.erase( std::prev( y.end(), offset ), y.end() );
+        if ( ( boundaries.size() > 1 ) && ( *std::prev( boundaries.end(), 2 ) == x.size() - 1 ) ) {
+
+          boundaries.pop_back();
+          interpolants.pop_back();
+        }
+        boundaries.back() = x.size() - 1;
       }
 
+      // see if the table is linearised
       bool linearised = std::all_of( interpolants.begin(), interpolants.end(),
                                      [] ( auto&& type )
                                         { return type == interpolation::InterpolationType::LinearLinear; } );
 
+      // see if we ever need the threshold value
       if ( std::none_of( interpolants.begin(), interpolants.end(),
                          [] ( auto&& type )
                             { return type == interpolation::InterpolationType::CoulombPenetrability; } ) ) {
@@ -554,15 +575,13 @@ namespace math {
 
       if ( this->numberRegions() > 1 ) {
 
-        // look in the grid for the x value
-        // upper_bound is used to get above jumps in the grid
-        auto xIter = std::upper_bound( this->x().begin(),
-                                       this->x().end(), x );
-        index = std::distance( this->x().begin(), xIter );
-
         // get the table that has to interpolate on this value
-        auto bIter = std::lower_bound( this->boundaries().begin(),
-                                       this->boundaries().end(), index );
+        auto compare = [&] ( const X& value, std::size_t boundary ) {
+
+          return value < this->x()[boundary];
+        };
+        auto bIter = std::upper_bound( this->boundaries().begin(),
+                                       this->boundaries().end(), x, compare );
         if ( this->boundaries().end() == bIter ) {
 
           --bIter;
@@ -1090,38 +1109,21 @@ namespace math {
     template < typename WeightFunction >
     decltype(auto) cumulativeIntegrate( const WeightFunction& weight ) const {
 
-      using I = decltype( weight.integrateHistogram( this->x()[0], this->x()[1], this->y()[0], this->y()[1] ) );
+      using I = decltype( std::declval< X >() * std::declval< Y >() * std::declval< typename WeightFunction::YType >() );
+      std::vector< I > result( this->x().size(), I( 0. ) );
+      auto previous = result.begin();
 
-      I first{ 0. };
-      auto cumulative = [&] ( auto&& table ) {
+      auto integrate = [&] ( const auto& table ) {
 
-        return table.cumulativeIntegrate( first, weight );
+        auto rbegin = std::next( result.begin(), std::distance( this->x().begin(), table.x().begin() ) );
+        std::fill( previous, std::next( rbegin ), *previous );
+        table.cumulativeIntegrate( rbegin, weight );
+        previous = std::next( rbegin, table.numberPoints() - 1 );
       };
 
-      auto number_equal_x = [this] ( const auto& table ) {
+      for ( const auto& table : this->tables() ) {
 
-        return std::distance( std::prev( table.x().end() ),
-                              std::upper_bound( table.x().end(), this->x().end(),
-                                                table.x().back() ) );
-      };
-
-      auto iter = this->tables().begin();
-      auto result = std::visit( cumulative, *iter );
-      ++iter;
-
-      while ( iter != this->tables().end() ) {
-
-        first = result.back();
-        auto integrals = std::visit( cumulative, *iter );
-        auto points = std::visit( number_equal_x, *std::prev( iter ) );
-
-        if ( points > 1 ) {
-
-          result.insert( result.end(), points - 1, first );
-        }
-        result.insert( result.end(), std::next( integrals.begin() ), integrals.end() );
-
-        ++iter;
+        std::visit( integrate, table );
       }
 
       return result;

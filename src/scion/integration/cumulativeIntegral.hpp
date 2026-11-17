@@ -2,7 +2,7 @@
 #define NJOY_SCION_INTEGRATION_CUMULATIVE_INTEGRAL
 
 // system includes
-#include <vector>
+#include <iterator>
 
 // other includes
 
@@ -14,56 +14,52 @@ namespace integration {
    *  @brief Calculate the cumulative integral by applying an analytical integrator
    *         on tabulated x and y values
    *
-   *  @param[in]     initial      the initial value of the cumulative integral to be used
-   *                              (i.e. the value of the integral at the end of the previous
-   *                              interpolation zone or zero if this is the first region)
-   *  @param[in,out] xbegin       the iterator to the upper x value of the current interval
-   *  @param[in]     xend         the iterator to the end of the x values
-   *  @param[in,out] ybegin       the iterator to the upper y value of the current interval
-   *  @param[in]     integrator   the itegrator to be applied
+   *  This calculates the cumulative integral over the entire x range.
+   *
+   *  @param[in] xbegin       the iterator to the first x value
+   *  @param[in] xend         the iterator to the end of the x values
+   *  @param[in] ybegin       the iterator to the first y value
+   *  @param[in] rbegin       the iterator to the cumulative integral for the first x value
+   *  @param[in] integrator   the integrator to be applied
    */
-  template< typename I, typename XIterator, typename YIterator, typename Integrator >
-  std::vector< I > cumulativeIntegral( const I& initial,
-                                       XIterator& xbegin, const XIterator& xend,
-                                       YIterator& ybegin, const Integrator& integrator ) {
+  template< typename XIterator, typename YIterator, typename RIterator, typename Integrator >
+  void cumulativeIntegral( XIterator xbegin, XIterator xend, YIterator ybegin,
+                           RIterator rbegin, const Integrator& integrator ) {
 
-    std::vector< I > result( std::distance( xbegin, xend ) + 1 );
-    auto previous = result.begin();
-    auto current = std::next( previous );
-    *previous = initial;
+    auto previous = rbegin;
+    if ( xbegin != xend ) {
+
+      ++xbegin;
+      ++ybegin;
+      ++rbegin;
+    }
 
     while ( xbegin != xend ) {
 
-      *current = *previous + integrator( *std::prev( xbegin ), *xbegin, *std::prev( ybegin ), *ybegin );
-      previous = current;
-      ++current;
+      *rbegin = *previous + integrator( *std::prev( xbegin ), *xbegin, *std::prev( ybegin ), *ybegin );
+      previous = rbegin;
       ++xbegin;
       ++ybegin;
+      ++rbegin;
     }
-
-    return result;
   }
 
   /**
    *  @brief Calculate the cumulative integral by applying an analytical integrator
    *         on tabulated x and y values
    *
-   *  @param[in]     initial      the initial value of the cumulative integral to be used
-   *                              (i.e. the value of the integral at the end of the previous
-   *                              interpolation zone or zero if this is the first region)
-   *  @param[in,out] x            the range of x values
-   *  @param[in,out] y            the range of y values
-   *  @param[in]     integrator   the integrator to be applied
+   *  This calculates the cumulative integral over the entire x range.
+   *
+   *  @param[in] x            the range of x values
+   *  @param[in] y            the range of y values
+   *  @param[in] rbegin       the iterator to the cumulative integral for the first x value
+   *  @param[in] integrator   the integrator to be applied
    */
-  template< typename I, typename XRange, typename YRange, typename Integrator >
-  std::vector< I > cumulativeIntegral( const I& initial,
-                                       const XRange& x, const YRange& y,
-                                       const Integrator& integrator ) {
+  template< typename XRange, typename YRange, typename RIterator, typename Integrator >
+  auto cumulativeIntegral( const XRange& x, const YRange& y,
+                           RIterator rbegin, const Integrator& integrator ) {
 
-    // the iterators point to the end of the first interval
-    auto xbegin = std::begin( x ) + 1;
-    auto ybegin = std::begin( y ) + 1;
-    return cumulativeIntegral( initial, xbegin, x.end(), ybegin, integrator );
+    cumulativeIntegral( x.begin(), x.end(), y.begin(), rbegin, integrator );
   }
 
 } // integration namespace

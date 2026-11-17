@@ -23,29 +23,21 @@ SCENARIO( "integrate" ) {
     std::vector< double > x = { 1., 2., 3, 4, 5. };
     std::vector< double > y = { 5., 4., 3, 2, 1. };
 
-    WHEN( "an analytical integrator is applied" ) {
+    WHEN( "calculating the integral over the x values" ) {
 
       THEN( "the integration is performed correctly using iterators" ) {
 
         // over the entire table
-        auto xbegin = x.begin() + 1;
-        auto ybegin = y.begin() + 1;
-        CHECK_THAT( 12.0, WithinRel( integration::integral( xbegin, x.end(), ybegin, integrator ) ) );
+        CHECK_THAT( 12.0, WithinRel( integration::integral( x.begin(), x.end(), y.begin(), integrator ) ) );
 
         // over the first 2 panels of the table
-        xbegin = x.begin() + 1;
-        ybegin = y.begin() + 1;
-        CHECK_THAT(  8.0, WithinRel( integration::integral( xbegin, xbegin + 2, ybegin, integrator ) ) );
+        CHECK_THAT(  8.0, WithinRel( integration::integral( x.begin(), x.begin() + 3, y.begin(), integrator ) ) );
 
         // over the middle 2 panels of the table
-        xbegin = x.begin() + 2;
-        ybegin = y.begin() + 2;
-        CHECK_THAT(  6.0, WithinRel( integration::integral( xbegin, xbegin + 2, ybegin, integrator ) ) );
+        CHECK_THAT(  6.0, WithinRel( integration::integral( x.begin() + 1, x.begin() + 4, y.begin() + 1, integrator ) ) );
 
         // over the last 2 panels of the table
-        xbegin = x.begin() + 3;
-        ybegin = y.begin() + 3;
-        CHECK_THAT(  4.0, WithinRel( integration::integral( xbegin, x.end(), ybegin, integrator ) ) );
+        CHECK_THAT(  4.0, WithinRel( integration::integral( x.begin() + 2, x.end(), y.begin() + 2, integrator ) ) );
       } // THEN
 
       THEN( "the integration is performed correctly using ranges" ) {
